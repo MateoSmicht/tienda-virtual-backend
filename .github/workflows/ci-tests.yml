@@ -12,13 +12,18 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0.32
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: tienda_virtual
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost -uroot -proot" --health-interval=10s --health-timeout=5s --health-retries=3
+        # Este comando de salud es clave para que el test espere a que el motor de BD esté listo
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout del código
@@ -32,4 +37,11 @@ jobs:
           cache: 'maven'
 
       - name: Ejecutar Tests con Maven
-        run: mvn -B -e test --file pom.xml
+        # Forzamos las propiedades aquí mismo por si el archivo de resources no se está leyendo bien
+        run: |
+          mvn -B -e test \
+          -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false \
+          -Dspring.datasource.username=root \
+          -Dspring.datasource.password=root \
+          -Dmercadopago.access.token=test_token \
+          -Dmercado.pago.webhook.url=http://localhost:8080
