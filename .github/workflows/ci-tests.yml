@@ -36,5 +36,12 @@ jobs:
           cache: 'maven'
 
       - name: Ejecutar Tests con Maven
-        # Todo en una sola línea para evitar errores de sintaxis en el shell de Linux
-        run: mvn -B -e test -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false -Dspring.datasource.username=root -Dspring.datasource.password=root -Dmercadopago.access.token=test_token -Dmercado.pago.webhook.url=http://localhost:8080 -Dspring.mail.password=test_password -Dspring.main.allow-bean-definition-overriding=true
+        run: |
+          mvn -B -e test \
+          "-Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false" \
+          "-Dspring.datasource.username=root" \
+          "-Dspring.datasource.password=root" \
+          "-Dmercadopago.access.token=test_token" \
+          "-Dmercado.pago.webhook.url=http://localhost:8080" \
+          "-Dspring.mail.password=test_password" \
+          "-Dspring.main.allow-bean-definition-overriding=true"
