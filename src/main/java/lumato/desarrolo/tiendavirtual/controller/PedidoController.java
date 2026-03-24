@@ -2,6 +2,7 @@ package lumato.desarrolo.tiendavirtual.controller;
 
 
 import lumato.desarrolo.tiendavirtual.dto.ActualizarEstadoDTO;
+import lumato.desarrolo.tiendavirtual.dto.NotificacionPedidoDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoRequestDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoResponseDTO;
 import lumato.desarrolo.tiendavirtual.model.Pedido;
@@ -89,5 +90,10 @@ public class PedidoController {
     public ResponseEntity<List<Pedido>> obtenerPedidosRecientes() {
         List<Pedido> ultimosPedidos = pedidoService.obtenerUltimos5Pedidos();
         return ResponseEntity.ok(ultimosPedidos);
+    }
+
+    @GetMapping("/notificaciones")
+    public ResponseEntity<List<NotificacionPedidoDTO>> obtenerNotificaciones() {
+        return ResponseEntity.ok(pedidoService.obtenerUltimasNotificaciones());
     }
 }

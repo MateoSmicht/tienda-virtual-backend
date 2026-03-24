@@ -1,6 +1,7 @@
 package lumato.desarrolo.tiendavirtual.service;
 
 
+import lumato.desarrolo.tiendavirtual.dto.NotificacionPedidoDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoRequestDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoResponseDTO;
 import lumato.desarrolo.tiendavirtual.model.Pedido;
@@ -19,4 +20,5 @@ public interface PedidoService {
     List<Pedido> obtenerPedidosPorRangoDeFechas(LocalDateTime inicio, LocalDateTime fin);
     List<Pedido> obtenerUltimos5Pedidos();
     Page<Pedido> obtenerPedidosPaginadosYFiltrados(int page, int size, EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
+    List<NotificacionPedidoDTO> obtenerUltimasNotificaciones();
 }

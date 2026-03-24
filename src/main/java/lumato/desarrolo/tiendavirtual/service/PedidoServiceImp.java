@@ -1,6 +1,7 @@
 package lumato.desarrolo.tiendavirtual.service;
 
 import lumato.desarrolo.tiendavirtual.dto.ItemCarritoDTO;
+import lumato.desarrolo.tiendavirtual.dto.NotificacionPedidoDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoRequestDTO;
 import lumato.desarrolo.tiendavirtual.dto.PedidoResponseDTO;
 import lumato.desarrolo.tiendavirtual.exception.StockInsuficienteException;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -159,7 +162,7 @@ public class PedidoServiceImp implements PedidoService {
                 productoService.ingresarStock(
                         detalle.getProducto().getId(),
                         detalle.getCantidad(),
-                        detalle.getProducto().getPpp() // Mantenemos el mismo valor
+                        detalle.getProducto().getPpp()
                 );
             });
         }
@@ -183,4 +186,21 @@ public class PedidoServiceImp implements PedidoService {
     public List<Pedido> obtenerUltimos5Pedidos() {
         return pedidoRepository.findTop5ByOrderByFechaPedidoDesc();
     }
+    @Override
+    public List<NotificacionPedidoDTO> obtenerUltimasNotificaciones() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+
+        return pedidoRepository.findTop5ByOrderByFechaPedidoDesc().stream()
+                .map(p -> {
+                    String nombre = (p.getUsuario() != null) ? p.getUsuario().getNombre() : "Usuario";
+                    Double total = (p.getTotal() != null) ? p.getTotal() : 0.0;
+                    String fechaStr = (p.getFechaPedido() != null) ? p.getFechaPedido().format(formatter) : "";
+
+                    String mensaje = "Nuevo pedido de " + nombre + " monto total: $" + total;
+
+                    return new NotificacionPedidoDTO(p.getId(), mensaje, fechaStr);
+                })
+                .toList();
+    }
+
 }

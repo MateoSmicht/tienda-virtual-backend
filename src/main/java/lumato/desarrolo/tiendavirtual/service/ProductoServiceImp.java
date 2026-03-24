@@ -1,6 +1,7 @@
 package lumato.desarrolo.tiendavirtual.service;
 
 
+
 import lumato.desarrolo.tiendavirtual.dto.ProductoStatsDTO;
 import lumato.desarrolo.tiendavirtual.exception.CodigoBarraDuplicadoException;
 import lumato.desarrolo.tiendavirtual.exception.ProductoNoEncontradoException;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -167,13 +167,14 @@ public class ProductoServiceImp implements ProductoService {
         return new ProductoStatsDTO(total, activos, sinStock, valorInventario);
     }
 
-
+    @Override
     public Page<Producto> obtenerProductosPaginadosYFiltrados(int page, int size, boolean todos, String busqueda, Long categoriaId, Long subcategoriaId, Integer stockMax) {
         Pageable pageable = PageRequest.of(page, size);
         if (busqueda != null && busqueda.trim().isEmpty()) busqueda = null;
 
         return productoRepository.buscarConFiltrosDinamicos(busqueda, categoriaId, subcategoriaId, stockMax, todos, pageable);
     }
+
 
 
 }
