@@ -1,7 +1,5 @@
 package lumato.desarrolo.tiendavirtual.service;
 
-
-
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.*;

@@ -4,38 +4,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lumato.desarrolo.tiendavirtual.exception.CodigoBarraDuplicadoException;
 import lumato.desarrolo.tiendavirtual.model.Producto;
 import lumato.desarrolo.tiendavirtual.service.ProductoService;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import org.springframework.test.context.bean.override.mockito.MockitoBean; // <-- ¡Este es el nuevo!
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// Le decimos a Spring que SOLO levante el contexto web para este Controller
-@WebMvcTest(ProductoController.class)
+
+@SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
 class ProductoControllerTest {
 
     @Autowired
-    private MockMvc mockMvc; // Nuestra herramienta para simular peticiones HTTP (Postman invisible)
+    private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper; // Para convertir objetos Java a JSON y viceversa
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @MockitoBean
-    private ProductoService productoService; // Mockeamos el servicio para no tocar la BD
+    private ProductoService productoService;
 
     private Producto productoFalso;
 
@@ -48,34 +42,57 @@ class ProductoControllerTest {
         productoFalso.setPrecio(150000.0);
     }
 
+    // ==========================================
+    // TESTS PARA POST: /api/productos
+    // ==========================================
+
     @Test
-    void crearProducto_ConDatosValidos_DebeRetornarStatus200() throws Exception {
-        // 1. Arrange
+    void crearProducto_ConDatosValidos_DebeRetornarStatus200_Y_Mensaje() throws Exception {
+        // 1. Arrange: Como tu guardarProducto devuelve 'void', usamos doNothing()
         when(productoService.guardarProducto(any(Producto.class))).thenReturn(productoFalso);
 
-        // Convertimos nuestro producto Java a un String JSON para mandarlo en el Body
         String productoJson = objectMapper.writeValueAsString(productoFalso);
 
-        // 2 & 3. Act & Assert: Hacemos un POST
+        // 2 & 3. Act & Assert
         mockMvc.perform(post("/api/productos")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(productoJson)) // Le metemos el JSON en el cuerpo
-                .andExpect(status().isOk()) // Dependiendo de tu controller, podría ser isCreated() (201)
-                .andExpect(jsonPath("$.nombre").value("Monitor 24 pulgadas"));
+                        .content(productoJson))
+                .andExpect(status().isOk())
+                // Verificamos que devuelva exactamente el String que pusiste en tu Controller
+                .andExpect(content().string("Producto guardado correctamente"));
     }
 
     @Test
     void crearProducto_ConCodigoDuplicado_DebeRetornarStatus409Conflict() throws Exception {
-        // 1. Arrange: Simulamos que el Service lanza la excepción que armamos antes
+        // 1. Arrange: Usamos doThrow para métodos void
         when(productoService.guardarProducto(any(Producto.class)))
                 .thenThrow(new CodigoBarraDuplicadoException("El código ya existe"));
 
         String productoJson = objectMapper.writeValueAsString(productoFalso);
 
-        // 2 & 3. Act & Assert: Hacemos el POST y esperamos que el GlobalExceptionHandler ataje el error
+        // 2 & 3. Act & Assert
         mockMvc.perform(post("/api/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productoJson))
-                .andExpect(status().isConflict()); // Esperamos el 409 Conflict que le pusimos a la excepción!
+                .andExpect(status().isConflict());
+    }
+
+    // ==========================================
+    // TESTS PARA GET: /api/productos/{id}
+    // ==========================================
+
+    @Test
+    void buscarProducto_PorIdExistente_DebeRetornarStatus200_Y_ElProducto() throws Exception {
+        // 1. Arrange
+        when(productoService.obtenerPorId(1L)).thenReturn(productoFalso);
+
+        // 2 & 3. Act & Assert
+        mockMvc.perform(get("/api/productos/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // Acá SÍ verificamos el JSON porque tu GET /api/productos/{id} devuelve el Producto entero
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.nombre").value("Monitor 24 pulgadas"))
+                .andExpect(jsonPath("$.codigoBarra").value("123456789"));
     }
 }

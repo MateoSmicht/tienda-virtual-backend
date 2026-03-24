@@ -1,9 +1,8 @@
-package lumato.desarrolo.tiendavirtual.testService;
+package lumato.desarrolo.tiendavirtual.service;
 
 import lumato.desarrolo.tiendavirtual.exception.StockInsuficienteException;
 import lumato.desarrolo.tiendavirtual.model.Producto;
 import lumato.desarrolo.tiendavirtual.repository.ProductoRepository;
-import lumato.desarrolo.tiendavirtual.service.ProductoServiceImp;
 import org.junit.function.ThrowingRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 // Le decimos a JUnit que vamos a usar Mockito para simular cosas
 @ExtendWith(MockitoExtension.class)
-class ProductoServiceImpTest {
+class ProductoServiceTestTest {
 
     @Mock // Simulamos la base de datos (NO va a tocar MySQL)
     private ProductoRepository productoRepository;
