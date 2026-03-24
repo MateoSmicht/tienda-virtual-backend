@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # MySQL 100% temporal y descartable
+    # Levantamos un MySQL temporal y descartable
     services:
       mysql:
         image: mysql:8.0.32
@@ -37,9 +37,16 @@ jobs:
           cache: 'maven'
 
       - name: Ejecutar Tests con Maven
-        # pasamos los datos falsos a Spring Boot solo por hoy
         env:
+          # 1. Credenciales de la BD temporal que creamos arriba
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/tienda_virtual?useSSL=false&serverTimezone=UTC
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: password_temporal_falsa
-        run: mvn -B test --file pom.xml
+
+          # 2. Variables de entorno "falsas" para engañar a Spring Boot
+          MERCADO_PAGO_WEBHOOK_URL: http://localhost:8080
+          MERCADO_PAGO_TOKEN: token_falso_de_prueba
+          JWT_SECRET: clave_secreta_falsa
+
+        # -B (Batch mode), -e (Errors para ver el detalle exacto si falla)
+        run: mvn -B -e test --file pom.xml
