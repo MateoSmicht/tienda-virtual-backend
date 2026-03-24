@@ -18,7 +18,6 @@ jobs:
           MYSQL_DATABASE: tienda_virtual
         ports:
           - 3306:3306
-        # Este comando de salud es clave para que el test espere a que el motor de BD esté listo
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -37,11 +36,5 @@ jobs:
           cache: 'maven'
 
       - name: Ejecutar Tests con Maven
-        # Forzamos las propiedades aquí mismo por si el archivo de resources no se está leyendo bien
-        run: |
-          mvn -B -e test \
-          -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false \
-          -Dspring.datasource.username=root \
-          -Dspring.datasource.password=root \
-          -Dmercadopago.access.token=test_token \
-          -Dmercado.pago.webhook.url=http://localhost:8080
+        # Todo en una sola línea para evitar errores de sintaxis en el shell de Linux
+        run: mvn -B -e test -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false -Dspring.datasource.username=root -Dspring.datasource.password=root -Dmercadopago.access.token=test_token -Dmercado.pago.webhook.url=http://localhost:8080 -Dspring.mail.password=test_password -Dspring.main.allow-bean-definition-overriding=true
