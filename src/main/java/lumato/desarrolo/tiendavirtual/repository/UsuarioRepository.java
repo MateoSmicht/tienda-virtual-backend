@@ -22,7 +22,6 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
 
-
     @Query("SELECT u FROM Usuario u WHERE " +
             "LOWER(u.nombre) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
             "LOWER(u.apellido) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +

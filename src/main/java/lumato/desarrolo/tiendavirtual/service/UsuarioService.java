@@ -1,5 +1,6 @@
 package lumato.desarrolo.tiendavirtual.service;
 
+import lumato.desarrolo.tiendavirtual.dto.EditarPerfilDTO;
 import lumato.desarrolo.tiendavirtual.model.Usuario;
 
 import java.util.List;
@@ -12,5 +13,7 @@ public interface UsuarioService {
     void addUser(Usuario user);
     void updateUser(Long id, Usuario updateUser);
     List<Usuario> searchUser(String termino);
+    void cambiarPassword(Long id, String passwordActual, String passwordNueva);
+    void actualizarPerfil(Long id, EditarPerfilDTO dto);
 
 }
