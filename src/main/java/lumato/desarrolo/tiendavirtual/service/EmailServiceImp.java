@@ -48,7 +48,6 @@ public class EmailServiceImp implements EmailService {
 
         mensaje.setText(texto.toString());
 
-        // ¡Disparamos el mail!
         mailSender.send(mensaje);
     }
 }

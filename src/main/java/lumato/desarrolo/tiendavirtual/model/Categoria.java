@@ -25,4 +25,5 @@ public class Categoria {
     @OneToMany(mappedBy = "categoria")
     @JsonIgnoreProperties("categoria")
     private List<Subcategoria> subcategorias;
+    private String icono;
 }

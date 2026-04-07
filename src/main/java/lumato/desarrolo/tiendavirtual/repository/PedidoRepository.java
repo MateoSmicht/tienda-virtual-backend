@@ -3,6 +3,7 @@ package lumato.desarrolo.tiendavirtual.repository;
 import lumato.desarrolo.tiendavirtual.dto.ProductoStatDTO;
 import lumato.desarrolo.tiendavirtual.model.Pedido;
 import lumato.desarrolo.tiendavirtual.model.enums.EstadoPedido;
+import lumato.desarrolo.tiendavirtual.model.enums.MetodoPago;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,19 +18,13 @@ import java.util.Optional;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
-    // 1. Para que el cliente pueda ver su historial de compras en la web
-    List<Pedido> findByUsuarioId(Long usuarioId);
-
-    // 2. Para tu panel de administración: filtrar pedidos por estado
-    // (Ej: Traer todos los pedidos "PENDIENTE" para armarlos)
-    List<Pedido> findByEstado(EstadoPedido estado);
-
-    // 3. Para las estadísticas del panel: Traer ventas en un rango de fechas
-    // (Con esto vas a poder calcular cuánto recaudaste hoy o en todo el mes)
+    // Para las estadísticas del panel: Traer ventas en un rango de fechas
     List<Pedido> findByFechaPedidoBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
     // Traer los pedidos de un cliente ordenados por el más reciente
-    List<Pedido> findByUsuario_IdOrderByFechaPedidoDesc(Long usuarioId);
+    List<Pedido> findByUsuarioIdOrderByFechaPedidoDesc(Long usuarioId);
+
+    List<Pedido> findByEstadoAndMetodoPagoAndFechaPedidoBefore(EstadoPedido estado, MetodoPago metodoPago, LocalDateTime limite);
 
     @Query("SELECT p FROM Pedido p WHERE " +
             "(:estado IS NULL OR p.estado = :estado) AND " +
@@ -42,7 +37,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             @Param("fechaFin") LocalDateTime fechaFin,
             Pageable pageable);
 
-    // Suma la plata de un periodo
+
     @Query("SELECT COALESCE(SUM(p.total), 0) FROM Pedido p WHERE p.fechaPedido >= :inicio AND p.fechaPedido <= :fin AND p.estado != 'CANCELADO'")
     Double sumIngresosEntreFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 

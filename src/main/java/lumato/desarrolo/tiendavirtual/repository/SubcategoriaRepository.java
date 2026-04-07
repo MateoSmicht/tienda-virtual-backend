@@ -11,7 +11,6 @@ import java.util.Optional;
 @Repository
 public interface SubcategoriaRepository extends JpaRepository<Subcategoria, Long> {
 
-    // Magia de Spring: Trae todas las subcategorías que pertenezcan a una categoría específica
     List<Subcategoria> findByCategoriaId(Long categoriaId);
 
     Optional<Subcategoria> findByNombreIgnoreCaseAndCategoriaId(String nombre, Long categoriaId);

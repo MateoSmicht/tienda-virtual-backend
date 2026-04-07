@@ -21,4 +21,5 @@ public interface PedidoService {
     List<Pedido> obtenerUltimos5Pedidos();
     Page<Pedido> obtenerPedidosPaginadosYFiltrados(int page, int size, EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
     List<NotificacionPedidoDTO> obtenerUltimasNotificaciones();
+    List<Pedido> obtenerPedidosDeUsuario(Long usuarioId);
 }

@@ -35,8 +35,7 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    // La magia de Spring: Un pedido tiene una lista de detalles
-    // CascadeType.ALL significa que si guardo el Pedido, se guardan todos sus detalles automáticamente
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> detalles = new ArrayList<>();
 

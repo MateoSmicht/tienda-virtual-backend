@@ -42,7 +42,6 @@ public class ProductoServiceImp implements ProductoService {
 
     @Override
     public Producto guardarProducto(Producto producto) {
-        // CORRECCIÓN DEL BUG: Verificamos que el código no exista EN OTRO producto distinto
         Optional<Producto> existente = productoRepository.findByCodigoBarra(producto.getCodigoBarra());
         if (existente.isPresent() && !existente.get().getId().equals(producto.getId())) {
             throw new CodigoBarraDuplicadoException("El código de barras " + producto.getCodigoBarra() + " ya está registrado.");
@@ -64,7 +63,6 @@ public class ProductoServiceImp implements ProductoService {
 
     @Override
     public Producto obtenerPorId(Long id) {
-        // ESTA ES LA MAGIA: Si no lo encuentra, lanza el error y frena todo.
         return productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNoEncontradoException("No se encontró el producto con ID: " + id));
     }
@@ -91,7 +89,7 @@ public class ProductoServiceImp implements ProductoService {
         producto.setStock(nuevoStock);
         producto.setPpp(Math.round(nuevoPpp * 100.0) / 100.0);
 
-        return productoRepository.save(producto); // Guardamos directo para no pasar por la validación de código de barras
+        return productoRepository.save(producto);
     }
 
     @Override
@@ -107,7 +105,6 @@ public class ProductoServiceImp implements ProductoService {
                 producto.setStock(stockActual - cantidadComprada);
                 return productoRepository.save(producto);
             } else {
-                // ACÁ USAMOS NUESTRA NUEVA EXCEPCIÓN
                 throw new StockInsuficienteException("Stock insuficiente para: " + producto.getNombre() + ". Stock actual: " + stockActual);
             }
             }
@@ -144,7 +141,6 @@ public class ProductoServiceImp implements ProductoService {
     public void aplicarOfertaMasiva(Long categoriaId, Double porcentaje) {
 
         // 1. Buscamos todos los productos que pertenezcan a esa categoría madre
-        // (Asegurate de tener este método en tu ProductoRepository)
         List<Producto> productos = productoRepository.buscarPorCategoriaMadre(categoriaId);
 
         // 2. Recorremos y reutilizamos tu método actual para aplicar la oferta a cada uno

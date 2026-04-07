@@ -30,7 +30,7 @@ public class ProductoController {
             @RequestParam(defaultValue = "false") boolean todos,
             @RequestParam(required = false) String busqueda,
             @RequestParam(required = false) Long categoriaId,
-            @RequestParam(required = false) Long subcategoriaId, // <--- NUEVO
+            @RequestParam(required = false) Long subcategoriaId,
             @RequestParam(required = false) Integer stockMax) {
 
         Page<Producto> productos = productoService.obtenerProductosPaginadosYFiltrados(page, size, todos, busqueda, categoriaId, subcategoriaId, stockMax);
@@ -53,14 +53,10 @@ public class ProductoController {
     @PutMapping("/{id}/estado")
     public ResponseEntity<String> cambiarEstado(@PathVariable Long id, @RequestParam Boolean disponible) {
 
-        // 1. Buscamos el producto en la base de datos (adaptalo a tu Service o Repository)
         Producto producto = productoService.obtenerPorId(id);
-        // (Si usás repository directo sería: productoRepository.findById(id).get(); )
 
-        // 2. Le cambiamos solo el estado
         producto.setDisponible(disponible);
 
-        // 3. Lo volvemos a guardar
         productoService.guardarProducto(producto);
 
         return ResponseEntity.ok("Estado actualizado correctamente");

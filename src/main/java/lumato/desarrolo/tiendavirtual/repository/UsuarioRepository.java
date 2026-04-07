@@ -13,9 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 
-    @Query("SELECT c FROM Usuario c WHERE email = :email AND password = :password")
-    List<Usuario> findByEmailAndPassword(@Param("email") String email,
-                                           @Param("password") String password);
+
     Optional<Usuario> findById(Long id);
 
     void deleteById(Long id);

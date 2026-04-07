@@ -12,6 +12,7 @@ public interface CategoriaService {
     Categoria crearCategoria(Categoria categoria);
     void eliminarCategoria(Long id);
     Categoria obtenerPorId(Long id);
+    Categoria modificarCategoria(Long id, Categoria cat);
 
     // Gestión de Subcategorías
     List<Subcategoria> obtenerSubcategoriasPorCategoria(Long categoriaId);

@@ -60,10 +60,8 @@ public class PedidoServiceImp implements PedidoService {
         // 3. Procesamos cada producto del carrito
         for (ItemCarritoDTO item : request.getItems()) {
 
-            // SOLUCIÓN: Solo obtenemos el producto para leer sus datos, NO descontamos stock acá
             Producto productoActualizado = productoService.obtenerPorId(item.getProductoId());
 
-            // VALIDACIÓN PREVENTIVA: Miramos si hay stock antes de dejarlo avanzar
             Boolean controla = (productoActualizado.getControlarStock() != null) ? productoActualizado.getControlarStock() : false;
             if (controla) {
                 Integer stockActual = (productoActualizado.getStock() != null) ? productoActualizado.getStock() : 0;
@@ -72,7 +70,7 @@ public class PedidoServiceImp implements PedidoService {
                 }
             }
 
-            // 4. Lógica de Precios: ¿Tiene oferta?
+            // 4. Lógica de Precios
             Double precioACobrar = productoActualizado.getPrecio();
             if (productoActualizado.getEsOferta() && productoActualizado.getPrecioOferta() != null) {
                 precioACobrar = productoActualizado.getPrecioOferta(); // Congelamos el precio rebajado
@@ -201,6 +199,12 @@ public class PedidoServiceImp implements PedidoService {
                     return new NotificacionPedidoDTO(p.getId(), mensaje, fechaStr);
                 })
                 .toList();
+    }
+
+
+    @Override
+    public List<Pedido> obtenerPedidosDeUsuario(Long usuarioId) {
+        return pedidoRepository.findByUsuarioIdOrderByFechaPedidoDesc(usuarioId);
     }
 
 }

@@ -19,13 +19,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody RequestLogin request) {
-        // Si la contraseña está mal, el servicio lanza la excepción y ni siquiera llega a la siguiente línea
+        // Si la contraseña está mal, el servicio lanza la excepción.
         Usuario user = service.login(request.getEmail(), request.getPassword());
 
         // Generamos el token
         String token = JwtUtil.generateToken(user);
 
-        // Devolvemos un JSON profesional con código HTTP 200 OK
+        // Devolvemos un JSON con código HTTP 200 OK
         return ResponseEntity.ok(new AuthResponseDTO(token, user.getId(), user.getEmail()));
     }
 }

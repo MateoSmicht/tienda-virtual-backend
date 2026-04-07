@@ -14,6 +14,8 @@ import lumato.desarrolo.tiendavirtual.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,13 +32,10 @@ public class MercadoPagoServiceImp implements MercadoPagoService {
     @Override
     public String crearLinkDePago(Pedido pedido) {
         try {
-            // 1. Creamos el cliente que se va a comunicar con MP
+            // 1. Cliente MP
             PreferenceClient client = new PreferenceClient();
 
-            // 2. Armamos el "ítem" a cobrar.
-            // Para simplificar, le mandamos el total del pedido directamente.
-            // 2. Armamos el "ítem" a cobrar.
-            // 2. Armamos el "ítem" a cobrar
+            // 2. Ítem (Tu lógica original)
             List<PreferenceItemRequest> items = new ArrayList<>();
             PreferenceItemRequest item = PreferenceItemRequest.builder()
                     .id("PEDIDO-" + pedido.getId())
@@ -49,48 +48,56 @@ public class MercadoPagoServiceImp implements MercadoPagoService {
                     .build();
             items.add(item);
 
-            // 3. Excluimos SOLO Efectivo y Cajeros (Dejamos Crédito, Débito y Cuenta)
-            // --------------------------------------------------------
+            // 3. Métodos de pago (Tu lógica original)
             List<PreferencePaymentTypeRequest> excludedPaymentTypes = new ArrayList<>();
-
-            // Excluimos Efectivo (Pago Fácil / Rapipago)
             excludedPaymentTypes.add(PreferencePaymentTypeRequest.builder().id("ticket").build());
-            // Excluimos Redes de Cajeros (Link / Banelco)
             excludedPaymentTypes.add(PreferencePaymentTypeRequest.builder().id("atm").build());
 
             PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()
                     .excludedPaymentTypes(excludedPaymentTypes)
                     .build();
 
-            // --------------------------------------------------------
-            // 4. Ensamblamos todo el pedido
-            // --------------------------------------------------------
+
+            // 3.5 NUEVO: Configuración de retorno a React
+            PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
+                    .success("http://localhost:5173/pago/exito")     // <--- A donde vuelve si sale OK
+                    .pending("http://localhost:5173/pago/pendiente") // <--- A donde vuelve si queda pendiente
+                    .failure("http://localhost:5173/pago/fallo")     // <--- A donde vuelve si falla o cancela
+                    .build();
+
+            // 4. Ensamblamos el pedido
+
+            OffsetDateTime ahora = OffsetDateTime.now();
+            OffsetDateTime vencimiento = ahora.plusMinutes(15);
             PreferenceRequest request = PreferenceRequest.builder()
                     .items(items)
                     .paymentMethods(paymentMethods)
                     .notificationUrl(webhookUrl + "/api/pagos/notificacion")
                     .externalReference(pedido.getId().toString())
+                    //.backUrls(backUrls)
+                    //.autoReturn("approved")
+                    .expires(true)
+                    .expirationDateFrom(ahora)
+                    .expirationDateTo(vencimiento)
                     .build();
 
-            // Forzamos el token directamente en la petición
+            // 5. Token y Creación
             com.mercadopago.core.MPRequestOptions options = com.mercadopago.core.MPRequestOptions.builder()
                     .accessToken(com.mercadopago.MercadoPagoConfig.getAccessToken())
                     .build();
 
-            // Pasamos el request Y las options
             Preference preference = client.create(request, options);
 
-           return preference.getInitPoint();
-           //return preference.getSandboxInitPoint(); // Este es el link de simulacro (Sandbox)
+            return preference.getInitPoint();
+
         } catch (MPApiException apiException) {
-        System.out.println("❌ Error de la API de Mercado Pago:");
-        System.out.println("Status Code: " + apiException.getApiResponse().getStatusCode());
-        System.out.println("Detalle exacto: " + apiException.getApiResponse().getContent());
-        return null;
-    } catch (MPException e) {
-        System.out.println("❌ Error interno de la librería: " + e.getMessage());
-        return null;
-    }
+            System.out.println("❌ Error de la API de Mercado Pago:");
+            System.out.println("Detalle exacto: " + apiException.getApiResponse().getContent());
+            return null;
+        } catch (MPException e) {
+            System.out.println("❌ Error interno de la librería: " + e.getMessage());
+            return null;
+        }
     }
 
     public void procesarNotificacion(Long paymentId) {
@@ -115,11 +122,9 @@ public class MercadoPagoServiceImp implements MercadoPagoService {
 
                     pedido.setEstado(EstadoPedido.PAGADO);
 
-                    // --- LA MAGIA DEL STOCK EMPIEZA ACÁ ---
                     System.out.println("📦 Descontando stock del pedido #" + idPedido);
 
-                    // Recorremos los detalles del pedido (cada línea del carrito)
-                    // (Asegurate de que tu clase Pedido tenga el getter para los detalles, ej: getDetalles())
+
                     pedido.getDetalles().forEach(detalle -> {
                         try {
                             productoService.descontarStock(
@@ -132,7 +137,6 @@ public class MercadoPagoServiceImp implements MercadoPagoService {
                             System.err.println("⚠️ Alerta de stock para " + detalle.getProducto().getNombre() + ": " + e.getMessage());
                         }
                     });
-                    // --- LA MAGIA DEL STOCK TERMINA ACÁ ---
 
                     // Finalmente guardamos el pedido con su nuevo estado
                     pedidoRepository.save(pedido);

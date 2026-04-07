@@ -43,7 +43,7 @@ public class SecurityConfiguration {
                     request.requestMatchers("/api/register", "/api/auth/login").permitAll();
 
                     // 3. RUTAS TEMPORALES (Hasta que conectes el login en React)
-                    request.requestMatchers("/api/categorias/**", "/api/productos/**", "/api/pedidos/**", "/api/estadisticas/**", "/api/user/**").permitAll();
+                    request.requestMatchers("/api/categorias/**", "/api/productos/**", "/api/pedidos/**", "/api/estadisticas/**", "/api/user/**","/api/banner", "/api/banner/**").permitAll();
 
                     // 4. Todo lo demás requiere token
                     request.anyRequest().authenticated();

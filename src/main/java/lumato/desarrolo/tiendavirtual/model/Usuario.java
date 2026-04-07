@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lumato.desarrolo.tiendavirtual.model.enums.Rol;
+
+import static lumato.desarrolo.tiendavirtual.model.enums.Rol.CLIENTE;
 
 @Entity
 @Table(name = "usuarios")
@@ -30,6 +33,8 @@ public class Usuario {
     @NotBlank(message = "La password no puede estar vacío")
     @Column(length = 255, nullable = false)
     private String password;
+
+    private Rol rol;
 
 
 }

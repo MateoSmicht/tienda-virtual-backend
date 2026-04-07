@@ -20,11 +20,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Trae las ofertas que además estén disponibles
     List<Producto> findByEsOfertaTrueAndDisponibleTrue();
 
-     List<Producto> findBySubcategoriaCategoriaIdAndDisponibleTrue(Long categoriaId);
      //Busqueda por codigo de barra
      Optional<Producto> findByCodigoBarra(String codigoBarra);
-    // Busca productos disponibles que contengan el nombre (Paginado)
-    Page<Producto> findByNombreContainingIgnoreCaseAndDisponibleTrue(String nombre, Pageable pageable);
 
     @Query("SELECT p FROM Producto p WHERE " +
             "(:busqueda IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR LOWER(p.codigoBarra) LIKE LOWER(CONCAT('%', :busqueda, '%'))) AND " +

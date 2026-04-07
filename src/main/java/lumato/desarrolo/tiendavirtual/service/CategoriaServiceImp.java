@@ -3,6 +3,7 @@ package lumato.desarrolo.tiendavirtual.service;
 
 import lumato.desarrolo.tiendavirtual.exception.CategoriaDuplicadaException;
 import lumato.desarrolo.tiendavirtual.model.Categoria;
+import lumato.desarrolo.tiendavirtual.model.Producto;
 import lumato.desarrolo.tiendavirtual.model.Subcategoria;
 import lumato.desarrolo.tiendavirtual.repository.CategoriaRepository;
 import lumato.desarrolo.tiendavirtual.repository.SubcategoriaRepository;
@@ -32,6 +33,16 @@ public class CategoriaServiceImp implements CategoriaService {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró la categoría con ID: " + id));
     }
+    @Override
+    public Categoria modificarCategoria(Long id, Categoria categoriaModificada) {
+        Categoria categoriaExistente = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró la categoría con ID: " + id));
+
+        categoriaExistente.setNombre(categoriaModificada.getNombre());
+        categoriaExistente.setIcono(categoriaModificada.getIcono());
+        return categoriaRepository.save(categoriaExistente);
+    }
+
 
     @Override
     public Categoria crearCategoria(Categoria categoria) {
@@ -73,7 +84,6 @@ public class CategoriaServiceImp implements CategoriaService {
         String nombreLimpio = subcategoria.getNombre().trim();
 
         // 2. Verificamos que no haya un duplicado DENTRO de esa misma categoría
-        // (Ej: Permite que exista "Cables" en "Computación" y también "Cables" en "Electricidad")
         if (subcategoriaRepository.findByNombreIgnoreCaseAndCategoriaId(nombreLimpio, categoriaId).isPresent()) {
             throw new CategoriaDuplicadaException("La subcategoría '" + nombreLimpio + "' ya existe dentro de " + categoriaPadre.getNombre());
         }

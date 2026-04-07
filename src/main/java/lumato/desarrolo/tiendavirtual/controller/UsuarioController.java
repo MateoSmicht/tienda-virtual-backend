@@ -3,6 +3,7 @@ package lumato.desarrolo.tiendavirtual.controller;
 import lumato.desarrolo.tiendavirtual.dto.CambiarPasswordDTO;
 import lumato.desarrolo.tiendavirtual.dto.EditarPerfilDTO;
 import lumato.desarrolo.tiendavirtual.model.Usuario;
+import lumato.desarrolo.tiendavirtual.model.enums.Rol;
 import lumato.desarrolo.tiendavirtual.service.UsuarioService;
 import lumato.desarrolo.tiendavirtual.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,16 @@ public class UsuarioController {
             service.actualizarPerfil(userId, dto);
 
             return ResponseEntity.ok(Map.of("mensaje", "Perfil actualizado correctamente"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/user/{id}/rol")
+    public ResponseEntity<?> modificarRol(@PathVariable Long id, @RequestParam Rol rol) {
+        try {
+            service.modificarRol(id, rol);
+            return ResponseEntity.ok(Map.of("mensaje", "Rol actualizado correctamente a " + rol));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

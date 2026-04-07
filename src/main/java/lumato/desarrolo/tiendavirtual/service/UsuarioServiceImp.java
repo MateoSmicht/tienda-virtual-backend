@@ -3,6 +3,7 @@ package lumato.desarrolo.tiendavirtual.service;
 import lumato.desarrolo.tiendavirtual.dto.EditarPerfilDTO;
 import lumato.desarrolo.tiendavirtual.exception.EmailDuplicadoException;
 import lumato.desarrolo.tiendavirtual.model.Usuario;
+import lumato.desarrolo.tiendavirtual.model.enums.Rol;
 import lumato.desarrolo.tiendavirtual.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +49,7 @@ public class UsuarioServiceImp implements UsuarioService {
         if (repository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailDuplicadoException("El email " + user.getEmail() + " ya está registrado en otra cuenta.");
         }
-
+        user.setRol(Rol.CLIENTE);
         // Encriptación profesional con BCrypt
         String hashPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashPassword);
@@ -99,6 +100,13 @@ public class UsuarioServiceImp implements UsuarioService {
         usuario.setTelefono(dto.getTelefono());
 
         repository.save(usuario);
+    }
+
+    @Override
+    public void modificarRol(Long id, Rol rol) {
+        Usuario user = getUser(id);
+        user.setRol(rol);
+        repository.save(user);
     }
 
 }

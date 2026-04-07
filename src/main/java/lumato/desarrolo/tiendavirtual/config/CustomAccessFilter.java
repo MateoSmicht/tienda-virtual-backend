@@ -38,6 +38,7 @@ public class CustomAccessFilter implements Filter {
                 path.startsWith("/api/productos") ||
                 path.startsWith("/api/pedidos") ||
                 path.startsWith("/api/estadisticas") ||
+                path.startsWith("/api/banner") ||
                 path.startsWith("/api/user")) {
 
             filterChain.doFilter(request, response);
@@ -49,8 +50,8 @@ public class CustomAccessFilter implements Filter {
             String header = request.getHeader("Authorization");
 
             if (header != null && header.startsWith("Bearer ")) {
-                String token = header.substring(7); // Sacamos la palabra "Bearer "
-                String userId = JwtUtil.getUserIdByToken(token); // Tu método actual
+                String token = header.substring(7);
+                String userId = JwtUtil.getUserIdByToken(token);
 
                 // Si el token es válido, le decimos a Spring Security que el usuario está autorizado
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());

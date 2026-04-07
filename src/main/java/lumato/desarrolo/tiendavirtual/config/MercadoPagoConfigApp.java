@@ -15,7 +15,7 @@ public class MercadoPagoConfigApp {
 
     @PostConstruct
     public void init() {
-        // Le inyectamos token oficial al SDK de Mercado Pago
+        //token oficial al SDK de Mercado Pago
         MercadoPagoConfig.setAccessToken(accessToken);
         System.out.println("✅ Mercado Pago inicializado correctamente.");
     }

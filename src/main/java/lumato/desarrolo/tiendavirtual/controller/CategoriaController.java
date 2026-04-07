@@ -2,6 +2,7 @@ package lumato.desarrolo.tiendavirtual.controller;
 
 
 import lumato.desarrolo.tiendavirtual.model.Categoria;
+import lumato.desarrolo.tiendavirtual.model.Producto;
 import lumato.desarrolo.tiendavirtual.model.Subcategoria;
 import lumato.desarrolo.tiendavirtual.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,28 +40,22 @@ public class CategoriaController {
         categoriaService.eliminarCategoria(id);
         return ResponseEntity.noContent().build();
     }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoriaDetails) {
-        // Primero buscamos la categoría que queremos editar
-        Categoria categoriaExistente = categoriaService.obtenerPorId(id);
-
-        // Le cambiamos el nombre por el que viene desde React
-        categoriaExistente.setNombre(categoriaDetails.getNombre());
-
-        // Guardamos los cambios y devolvemos el OK
-        return ResponseEntity.ok(categoriaService.crearCategoria(categoriaExistente));
-        // (Uso crearCategoria asumiendo que tu service usa el save() de JPA, que sirve tanto para crear como para actualizar)
+    public ResponseEntity<Categoria> modificarCategoria(@PathVariable Long id,
+                                  @RequestBody Categoria categoriaModificado) {
+        Categoria actualizada = categoriaService.modificarCategoria(id, categoriaModificado);
+        return ResponseEntity.ok(actualizada);
     }
 
 
-    // Ej: GET /api/categorias/1/subcategorias (Trae "Aerosoles", "Líquidos" de la categoría Limpieza)
+
+
     @GetMapping("/{categoriaId}/subcategorias")
     public ResponseEntity<List<Subcategoria>> listarSubcategorias(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(categoriaService.obtenerSubcategoriasPorCategoria(categoriaId));
     }
 
-    // Ej: POST /api/categorias/1/subcategorias (Agrega una nueva subcategoría a Limpieza)
+
     @PostMapping("/{categoriaId}/subcategorias")
     public ResponseEntity<Subcategoria> crearSubcategoria(
             @PathVariable Long categoriaId,
