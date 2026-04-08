@@ -10,20 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: tienda_virtual
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
@@ -37,14 +23,11 @@ jobs:
 
       - name: Ejecutar Tests con Maven
         run: >
-            mvn -B -e test 
-            "-Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/tienda_virtual?allowPublicKeyRetrieval=true&useSSL=false" 
-            "-Dspring.datasource.username=root" 
-            "-Dspring.datasource.password=root" 
-            "-Dmercadopago.access.token=test_token" 
-            "-Dmercado.pago.webhook.url=http://localhost:8080" 
-            "-Dspring.mail.host=smtp.gmail.com" 
-            "-Dspring.mail.port=587" 
-            "-Dspring.mail.username=test" 
-            "-Dspring.mail.password=test" 
-            "-Dspring.main.allow-bean-definition-overriding=true"
+          mvn -B -e test 
+          "-Dmercadopago.access.token=test_token" 
+          "-Dmercado.pago.webhook.url=http://localhost:8080" 
+          "-Dspring.mail.host=smtp.gmail.com" 
+          "-Dspring.mail.port=587" 
+          "-Dspring.mail.username=test" 
+          "-Dspring.mail.password=test" 
+          "-Dspring.main.allow-bean-definition-overriding=true"
